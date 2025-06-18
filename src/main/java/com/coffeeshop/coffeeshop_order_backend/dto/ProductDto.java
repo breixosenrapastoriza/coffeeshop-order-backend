@@ -20,12 +20,12 @@ public class ProductDto {
     
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be greater than 0")
-    private BigDecimal price;
+    private double price;
     
     private String description;
 
     private String productType;
     private String coffeeType;
     private String teaType;
-    private String[] smoothieIngredients;
+    private String[] fruits;
 }

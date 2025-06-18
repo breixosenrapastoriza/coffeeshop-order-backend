@@ -1,6 +1,7 @@
 package com.coffeeshop.coffeeshop_order_backend.controller;
 
-import com.coffeeshop.coffeeshop_order_backend.model.Product;
+import com.coffeeshop.coffeeshop_order_backend.dto.ProductDto;
+import com.coffeeshop.coffeeshop_order_backend.mapper.ProductMapper;
 import com.coffeeshop.coffeeshop_order_backend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,32 +15,38 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductMapper productMapper;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        List<Product> products = productService.findAll();
+        return ResponseEntity.ok(productMapper.toDtoList(products));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.findById(id));
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
+        Product product = productService.findById(id);
+        return ResponseEntity.ok(productMapper.toDto(product));
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        return ResponseEntity.ok(productService.save(product));
+    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+        Product product = productService.save(productMapper.toEntity(productDto));
+        return ResponseEntity.ok(productMapper.toDto(product));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@RequestBody Product product) {
-        return ResponseEntity.ok(productService.save(product));
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
+        Product product = productMapper.toEntity(productDto);
+        product.setId(id);
+        Product updatedProduct = productService.save(product);
+        return ResponseEntity.ok(productMapper.toDto(updatedProduct));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public void deleteProduct(@PathVariable Long id) {
         Product product = productService.findById(id);
         productService.delete(product);
-        return ResponseEntity.noContent().build();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.coffeeshop.coffeeshop_order_backend.controller;
 
+import com.coffeeshop.coffeeshop_order_backend.dto.OrderDto;
+import com.coffeeshop.coffeeshop_order_backend.mapper.OrderMapper;
 import com.coffeeshop.coffeeshop_order_backend.model.Order;
 import com.coffeeshop.coffeeshop_order_backend.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -14,40 +16,48 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderMapper orderMapper;
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        return ResponseEntity.ok(orderService.findAll());
+    public ResponseEntity<List<OrderDto>> getAllOrders() {
+        List<Order> orders = orderService.findAll();
+        return ResponseEntity.ok(orderMapper.toDtoList(orders));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.findById(id));
+    public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
+        Order order = orderService.findById(id);
+        return ResponseEntity.ok(orderMapper.toDto(order));
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        return ResponseEntity.ok(orderService.save(order));
+    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) {
+        Order order = orderService.save(orderMapper.toEntity(orderDto));
+        return ResponseEntity.ok(orderMapper.toDto(order));
     }
 
     @PutMapping("/{id}/start")
-    public ResponseEntity<Order> startOrderPreparation(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.startPreparation(id));
+    public ResponseEntity<OrderDto> startOrderPreparation(@PathVariable Long id) {
+        Order order = orderService.startPreparation(id);
+        return ResponseEntity.ok(orderMapper.toDto(order));
     }
 
     @PutMapping("/{id}/ready")
-    public ResponseEntity<Order> markOrderAsReady(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.markAsReady(id));
+    public ResponseEntity<OrderDto> markOrderAsReady(@PathVariable Long id) {
+        Order order = orderService.markAsReady(id);
+        return ResponseEntity.ok(orderMapper.toDto(order));
     }
 
     @PutMapping("/{id}/complete")
-    public ResponseEntity<Order> completeOrder(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.complete(id));
+    public ResponseEntity<OrderDto> completeOrder(@PathVariable Long id) {
+        Order order = orderService.complete(id);
+        return ResponseEntity.ok(orderMapper.toDto(order));
     }
 
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.cancel(id));
+    public ResponseEntity<OrderDto> cancelOrder(@PathVariable Long id) {
+        Order order = orderService.cancel(id);
+        return ResponseEntity.ok(orderMapper.toDto(order));
     }
 
     @DeleteMapping("/{id}")

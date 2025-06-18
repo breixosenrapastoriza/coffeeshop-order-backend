@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,10 @@ public class Order {
             .order(this)
             .build();
         items.add(item);
+    }
+
+    public void deleteItem(Long itemId) {
+        items.removeIf(item -> item.getId().equals(itemId));
     }
 
     public double getTotal() {
