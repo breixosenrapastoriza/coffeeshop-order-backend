@@ -116,7 +116,5 @@ public class CoffeeshopOrderBackendApplication {
         System.out.println("\n=== All orders ===");
         orderService.findAll().forEach(System.out::println);
 
-        System.out.println("\n=== Fin de la prueba ===");
-        System.out.println("Breixo Senra Pastoriza");
     }
 }
