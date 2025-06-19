@@ -2,6 +2,7 @@ package com.coffeeshop.coffeeshop_order_backend.controller;
 
 import com.coffeeshop.coffeeshop_order_backend.dto.ProductDto;
 import com.coffeeshop.coffeeshop_order_backend.mapper.ProductMapper;
+import com.coffeeshop.coffeeshop_order_backend.model.Product;
 import com.coffeeshop.coffeeshop_order_backend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
