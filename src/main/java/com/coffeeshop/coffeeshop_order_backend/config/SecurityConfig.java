@@ -28,8 +28,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // No usamos sesión
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ) // No usamos sesión al tener JWT, para que Spring n cree sesiones innecesarias
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // Añadimos nuestro filtro JWT
                 .build();
     }

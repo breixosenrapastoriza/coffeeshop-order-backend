@@ -15,7 +15,7 @@ import java.util.Collections;
 @Builder
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor//(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User implements UserDetails {
 
@@ -57,4 +57,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
