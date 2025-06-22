@@ -4,6 +4,7 @@ import com.coffeeshop.coffeeshop_order_backend.dto.AuthResponseDto;
 import com.coffeeshop.coffeeshop_order_backend.dto.LoginRequestDto;
 import com.coffeeshop.coffeeshop_order_backend.dto.RegisterRequestDto;
 import com.coffeeshop.coffeeshop_order_backend.model.User;
+import com.coffeeshop.coffeeshop_order_backend.model.enums.Role;
 import com.coffeeshop.coffeeshop_order_backend.service.UserService;
 import com.coffeeshop.coffeeshop_order_backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(user);
-
+        System.out.println("Alert");
         return ResponseEntity.ok(new AuthResponseDto(token, user, user.getRole().name()));
     }
 
@@ -46,7 +47,7 @@ public class AuthController {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword()); // La contraseña se encriptará en el UserService
-        user.setRole(user.getRole());
+        user.setRole(Role.valueOf(request.getRole()));
 
         userService.saveUser(user);
 
@@ -54,7 +55,8 @@ public class AuthController {
         String token = jwtUtil.generateToken(user);
 
         // Devolver la respuesta usando LoginResponseDto
-        return ResponseEntity.ok(new AuthResponseDto(token, user, user.getRole().name()));
+        return ResponseEntity.ok(new AuthResponseDto(token, user, user.getRole().toString()));
+
     }
 
 }
