@@ -30,6 +30,7 @@ public class UserService implements UserDetailsService {
 
     public void saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
     }
 
     public boolean checkPassword(String rawPassword, String encodedPassword) {
