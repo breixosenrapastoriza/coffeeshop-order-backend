@@ -13,6 +13,9 @@ public class OrderItemDto {
     
     @NotNull(message = "Product ID is required")
     private Long productId;
+
+    @NotNull(message = "Product ID is required")
+    private Long orderId;
     
     @NotNull(message = "Quantity is required")
     @Positive(message = "Quantity must be greater than 0")

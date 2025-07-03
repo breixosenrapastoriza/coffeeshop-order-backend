@@ -28,9 +28,9 @@ public class UserService implements UserDetailsService {
         return userRepository.existsByUsername(username);
     }
 
-    public void saveUser(User user) {
+    public User save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public boolean checkPassword(String rawPassword, String encodedPassword) {

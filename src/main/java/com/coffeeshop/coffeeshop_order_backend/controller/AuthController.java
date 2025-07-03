@@ -1,6 +1,7 @@
 package com.coffeeshop.coffeeshop_order_backend.controller;
 
 import com.coffeeshop.coffeeshop_order_backend.dto.AuthResponseDto;
+import com.coffeeshop.coffeeshop_order_backend.dto.ErrorResponseDto;
 import com.coffeeshop.coffeeshop_order_backend.dto.LoginRequestDto;
 import com.coffeeshop.coffeeshop_order_backend.dto.RegisterRequestDto;
 import com.coffeeshop.coffeeshop_order_backend.model.User;
@@ -8,11 +9,14 @@ import com.coffeeshop.coffeeshop_order_backend.model.enums.Role;
 import com.coffeeshop.coffeeshop_order_backend.service.UserService;
 import com.coffeeshop.coffeeshop_order_backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -22,40 +26,52 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginRequestDto request) {
-        // Buscar el usuario por username
-        User user = userService.loadUserByUsername(request.getUsername());
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto request) {
+        try {
+            // Buscar el usuario por username
+            User user = userService.loadUserByUsername(request.getUsername());
+            if (!userService.checkPassword(request.getPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponseDto.builder().message("Invalid credentials").build());
+            }
 
-        // Verificar la contraseña
-        if (!userService.checkPassword(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            String token = jwtUtil.generateToken(user);
+            return ResponseEntity.ok(AuthResponseDto.builder().token(token).user(user).role(String.valueOf(user.getRole())).build());
+
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponseDto.builder().message("Username does not exist").build());
         }
 
-        String token = jwtUtil.generateToken(user);
-        System.out.println("Alert");
-        return ResponseEntity.ok(new AuthResponseDto(token, user, user.getRole().name()));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDto> register(@RequestBody RegisterRequestDto request) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequestDto request) {
+        // Verificar si el rol es válido
+        try {
+            Role.valueOf(request.getRole());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponseDto.builder().message("Invalid role").build());
+        }
+
         // Verificar si el usuario ya existe
         if (userService.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDto.builder().message("Username already exists").build());
         }
 
         // Crear y guardar el usuario
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword()); // La contraseña se encriptará en el UserService
-        user.setRole(Role.valueOf(request.getRole()));
+        User user = User
+                .builder()
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .role(Role.valueOf(request.getRole()))
+                .build();
 
-        userService.saveUser(user);
 
-        // Generar token JWT
+        userService.save(user);
+
         String token = jwtUtil.generateToken(user);
 
         // Devolver la respuesta usando LoginResponseDto
-        return ResponseEntity.ok(new AuthResponseDto(token, user, user.getRole().toString()));
+        return ResponseEntity.ok(AuthResponseDto.builder().token(token).user(user).role(String.valueOf(user.getRole())).build());
 
     }
 
